@@ -14,6 +14,10 @@ package com.astuetz;
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * "Smart" additions simply include 2 properties: {@value mFastScrolling}, {@value mFastScrollingListener}
+ * This is otherwise a copy/paste of the original ViewPager class found in the support library
+ * @author sarahlensing
  */
 
 import android.content.Context;
