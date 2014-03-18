@@ -6,7 +6,7 @@ import android.support.v4.view.ViewPager;
 /**
  * Created by sarahlensing on 3/17/14.
  */
-public interface PagerSlidingTabInterface {
+public interface SlidingTabConnector {
     public int getCurrentItem();
     public PagerAdapter getAdapter();
     public void setCurrentItem(int item);

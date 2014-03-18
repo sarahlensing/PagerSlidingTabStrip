@@ -28,6 +28,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.TypedValue;
 import android.view.Menu;
@@ -35,13 +36,15 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.astuetz.PagerSlidingTabStrip;
+import com.astuetz.SlidingTabConnector;
+import com.astuetz.SmartViewPager;
 
 public class MainActivity extends FragmentActivity {
 
 	private final Handler handler = new Handler();
 
 	private PagerSlidingTabStrip tabs;
-	private ViewPager pager;
+	private SmartViewPager pager;
 	private MyPagerAdapter adapter;
 
 	private Drawable oldBackground = null;
@@ -53,7 +56,7 @@ public class MainActivity extends FragmentActivity {
 		setContentView(R.layout.activity_main);
 
 		tabs = (PagerSlidingTabStrip) findViewById(R.id.tabs);
-		pager = (ViewPager) findViewById(R.id.pager);
+		pager = (SmartViewPager) findViewById(R.id.pager);
 		adapter = new MyPagerAdapter(getSupportFragmentManager());
 
 		pager.setAdapter(adapter);
@@ -62,7 +65,27 @@ public class MainActivity extends FragmentActivity {
 				.getDisplayMetrics());
 		pager.setPageMargin(pageMargin);
 
-		tabs.setViewPager(pager);
+        tabs.setViewPagerConnector(new SlidingTabConnector() {
+            @Override
+            public int getCurrentItem() {
+                return pager.getCurrentItem();
+            }
+
+            @Override
+            public PagerAdapter getAdapter() {
+                return pager.getAdapter();
+            }
+
+            @Override
+            public void setCurrentItem(int item) {
+                pager.setCurrentItem(item);
+            }
+
+            @Override
+            public void setOnPageChangeListener(ViewPager.OnPageChangeListener listener) {
+                pager.setOnPageChangeListener(listener);
+            }
+        });
 
 		changeColor(currentColor);
 	}

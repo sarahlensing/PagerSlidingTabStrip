@@ -64,7 +64,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 	public OnPageChangeListener delegatePageListener;
 
 	private LinearLayout tabsContainer;
-    private PagerSlidingTabInterface mPagerConnector;
+    private SlidingTabConnector mPagerConnector;
 
 	private int tabCount;
 
@@ -172,7 +172,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 	}
 
     public void setViewPager(final ViewPager pager) {
-        setViewPagerConnector(new PagerSlidingTabInterface() {
+        setViewPagerConnector(new SlidingTabConnector() {
             @Override
             public int getCurrentItem() {
                 return pager.getCurrentItem();
@@ -195,7 +195,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
         });
     }
 
-	public void setViewPagerConnector(PagerSlidingTabInterface pagerConnector) {
+	public void setViewPagerConnector(SlidingTabConnector pagerConnector) {
 		this.mPagerConnector = pagerConnector;
 
 		if (mPagerConnector.getAdapter() == null) {
