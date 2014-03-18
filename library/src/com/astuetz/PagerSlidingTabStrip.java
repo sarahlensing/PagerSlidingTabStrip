@@ -26,6 +26,7 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.util.AttributeSet;
@@ -39,9 +40,9 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.Locale;
-
 import com.astuetz.pagerslidingtabstrip.R;
+
+import java.util.Locale;
 
 public class PagerSlidingTabStrip extends HorizontalScrollView {
 
@@ -63,7 +64,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 	public OnPageChangeListener delegatePageListener;
 
 	private LinearLayout tabsContainer;
-	private ViewPager pager;
+    private PagerSlidingTabInterface mPagerConnector;
 
 	private int tabCount;
 
@@ -170,14 +171,38 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 		}
 	}
 
-	public void setViewPager(ViewPager pager) {
-		this.pager = pager;
+    public void setViewPager(final ViewPager pager) {
+        setViewPagerConnector(new PagerSlidingTabInterface() {
+            @Override
+            public int getCurrentItem() {
+                return pager.getCurrentItem();
+            }
 
-		if (pager.getAdapter() == null) {
+            @Override
+            public PagerAdapter getAdapter() {
+                return pager.getAdapter();
+            }
+
+            @Override
+            public void setCurrentItem(int item) {
+                pager.setCurrentItem(item);
+            }
+
+            @Override
+            public void setOnPageChangeListener(OnPageChangeListener listener) {
+                pager.setOnPageChangeListener(listener);
+            }
+        });
+    }
+
+	public void setViewPagerConnector(PagerSlidingTabInterface pagerConnector) {
+		this.mPagerConnector = pagerConnector;
+
+		if (mPagerConnector.getAdapter() == null) {
 			throw new IllegalStateException("ViewPager does not have adapter instance.");
 		}
 
-		pager.setOnPageChangeListener(pageListener);
+        mPagerConnector.setOnPageChangeListener(pageListener);
 
 		notifyDataSetChanged();
 	}
@@ -190,14 +215,14 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 
 		tabsContainer.removeAllViews();
 
-		tabCount = pager.getAdapter().getCount();
+		tabCount = mPagerConnector.getAdapter().getCount();
 
 		for (int i = 0; i < tabCount; i++) {
 
-			if (pager.getAdapter() instanceof IconTabProvider) {
-				addIconTab(i, ((IconTabProvider) pager.getAdapter()).getPageIconResId(i));
+			if (mPagerConnector.getAdapter() instanceof IconTabProvider) {
+				addIconTab(i, ((IconTabProvider) mPagerConnector.getAdapter()).getPageIconResId(i));
 			} else {
-				addTextTab(i, pager.getAdapter().getPageTitle(i).toString());
+				addTextTab(i, mPagerConnector.getAdapter().getPageTitle(i).toString());
 			}
 
 		}
@@ -217,7 +242,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 					getViewTreeObserver().removeOnGlobalLayoutListener(this);
 				}
 
-				currentPosition = pager.getCurrentItem();
+				currentPosition = mPagerConnector.getCurrentItem();
 				scrollToChild(currentPosition, 0);
 			}
 		});
@@ -248,7 +273,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 		tab.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				pager.setCurrentItem(position);
+                mPagerConnector.setCurrentItem(position);
 			}
 		});
 
@@ -370,7 +395,7 @@ public class PagerSlidingTabStrip extends HorizontalScrollView {
 		@Override
 		public void onPageScrollStateChanged(int state) {
 			if (state == ViewPager.SCROLL_STATE_IDLE) {
-				scrollToChild(pager.getCurrentItem(), 0);
+				scrollToChild(mPagerConnector.getCurrentItem(), 0);
 			}
 
 			if (delegatePageListener != null) {
